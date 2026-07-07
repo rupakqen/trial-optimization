@@ -32,16 +32,25 @@
 
     <main class="flex flex-1 overflow-hidden">
       <section
-        class="w-5/12 bg-slate-900/50 p-6 flex flex-col space-y-6 overflow-y-auto border-r border-slate-800"
+        class="w-5/12 bg-slate-900/50 p-6 flex flex-col space-y-4 overflow-y-auto border-r border-slate-800"
       >
         <div
           class="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-4"
         >
-          <h2
-            class="text-sm font-semibold tracking-wide text-indigo-400 uppercase"
-          >
-            1. Target Parameters (GeoJSON BBOX)
-          </h2>
+          <div class="flex justify-between items-center">
+            <h2
+              class="text-sm font-semibold tracking-wide text-indigo-400 uppercase"
+            >
+              1. Target Parameters
+            </h2>
+            <button
+              id="btn-draw-mode"
+              class="px-3 py-1 bg-indigo-600/20 hover:bg-indigo-600/40 border border-indigo-500/30 text-indigo-300 text-[11px] rounded transition font-mono cursor-pointer"
+            >
+              [┼] Enable Map Draw Mode
+            </button>
+          </div>
+
           <div class="grid grid-cols-2 gap-3 text-xs font-mono">
             <div>
               <label class="text-slate-400 block mb-1">Min Lat / Lon</label>
@@ -49,7 +58,7 @@
                 id="bbox-min"
                 type="text"
                 value="34.00, -120.00"
-                class="w-full bg-slate-950 border border-slate-700 rounded p-2 text-emerald-400 focus:outline-none focus:border-indigo-500"
+                class="w-full bg-slate-950 border border-slate-700 rounded p-2 text-emerald-400 focus:outline-none"
               />
             </div>
             <div>
@@ -58,14 +67,41 @@
                 id="bbox-max"
                 type="text"
                 value="36.00, -118.00"
-                class="w-full bg-slate-950 border border-slate-700 rounded p-2 text-emerald-400 focus:outline-none focus:border-indigo-500"
+                class="w-full bg-slate-950 border border-slate-700 rounded p-2 text-emerald-400 focus:outline-none"
               />
             </div>
           </div>
-          <p class="text-[11px] text-slate-400 italic">
-            💡 Click and drag a bounding box directly on the map to auto-fill
-            coordinates.
-          </p>
+
+          <div class="grid grid-cols-2 gap-3 text-xs font-mono pt-1">
+            <div>
+              <label class="text-slate-400 block mb-1"
+                >Acquisition Start (ZULU)</label
+              >
+              <input
+                id="time-start"
+                type="datetime-local"
+                class="w-full bg-slate-950 border border-slate-700 rounded p-2 text-indigo-300 focus:outline-none"
+              />
+            </div>
+            <div>
+              <label class="text-slate-400 block mb-1"
+                >Acquisition End (ZULU)</label
+              >
+              <input
+                id="time-end"
+                type="datetime-local"
+                class="w-full bg-slate-950 border border-slate-700 rounded p-2 text-indigo-300 focus:outline-none"
+              />
+            </div>
+          </div>
+          <div
+            class="text-[11px] text-slate-400 border-t border-slate-800 pt-2 flex justify-between font-mono"
+          >
+            <span>Calculated Footprint Area:</span>
+            <span id="calculated-area" class="text-amber-400 font-bold"
+              >-- sq km</span
+            >
+          </div>
         </div>
 
         <div
@@ -74,13 +110,13 @@
           <h2
             class="text-sm font-semibold tracking-wide text-indigo-400 uppercase"
           >
-            2. Multi-Objective Trade-off Weights
+            2. Multi-Objective Weights
           </h2>
           <div class="space-y-3 text-xs">
             <div>
               <div class="flex justify-between mb-1">
                 <span class="text-slate-300"
-                  >Priority Weight: Resolution ($\alpha$)</span
+                  >Priority Weight: Resolution (α)</span
                 >
                 <span id="weight-res-val" class="text-indigo-400 font-mono"
                   >0.4</span
@@ -99,7 +135,7 @@
             <div>
               <div class="flex justify-between mb-1">
                 <span class="text-slate-300"
-                  >Priority Weight: Speed / Latency ($\beta$)</span
+                  >Priority Weight: Speed / Latency (β)</span
                 >
                 <span id="weight-speed-val" class="text-indigo-400 font-mono"
                   >0.4</span
@@ -118,7 +154,7 @@
             <div>
               <div class="flex justify-between mb-1">
                 <span class="text-slate-300"
-                  >Priority Weight: Cost Minimization ($\gamma$)</span
+                  >Priority Weight: Cost Minimization (γ)</span
                 >
                 <span id="weight-cost-val" class="text-indigo-400 font-mono"
                   >0.2</span
@@ -139,23 +175,23 @@
 
         <button
           id="btn-optimize"
-          class="w-full py-3 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white font-bold rounded-xl shadow-lg transition duration-200 uppercase tracking-wider text-sm cursor-pointer"
+          class="w-full py-3 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white font-bold rounded-xl transition uppercase tracking-wider text-sm cursor-pointer shadow-md"
         >
           Run Constrained Optimization Engine
         </button>
 
-        <div class="flex-1 flex flex-col min-h-[300px]">
+        <div class="flex-1 flex flex-col min-h-[250px]">
           <h2
             class="text-sm font-semibold tracking-wide text-indigo-400 uppercase mb-3"
           >
-            Optimized Collection Options (STAC Aligned)
+            Feasibility Results Matrix (API Modeled)
           </h2>
           <div
             id="results-container"
             class="space-y-3 overflow-y-auto flex-1 pr-1 text-xs"
           >
             <div class="text-slate-500 italic text-center py-10">
-              Define target and trigger negotiation to populate windows...
+              Define targets, adjust timestamps, and run negotiation engine...
             </div>
           </div>
         </div>
