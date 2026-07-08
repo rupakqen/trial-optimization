@@ -1,29 +1,11 @@
-/* Custom Scrollbars for dark tactical theme */
-::-webkit-scrollbar {
-    width: 6px;
-}
-::-webkit-scrollbar-track {
-    background: #020617; 
-}
-::-webkit-scrollbar-thumb {
-    background: #334155; 
-    border-radius: 3px;
-}
-::-webkit-scrollbar-thumb:hover {
-    background: #475569; 
-}
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #020617; }
+::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #475569; }
 
-/* Ensure Leaflet controls match our tactical UI dark palette */
-.leaflet-bar {
-    border: 1px solid #334155 !important;
-    box-shadow: none !important;
-}
-.leaflet-bar a {
-    background-color: #0f172a !important;
-    color: #94a3b8 !important;
-    border-bottom: 1px solid #334155 !important;
-}
-.leaflet-bar a:hover {
-    background-color: #1e293b !important;
-    color: #f8fafc !important;
-}
+.leaflet-bar { border: 1px solid #334155 !important; box-shadow: none !important; }
+.leaflet-bar a { background-color: #0f172a !important; color: #94a3b8 !important; border-bottom: 1px solid #334155 !important; }
+.leaflet-bar a:hover { background-color: #1e293b !important; color: #f8fafc !important; }
+
+/* Custom crosshair modification when draw mode is engaged */
+.draw-mode-crosshair { cursor: crosshair !important; }

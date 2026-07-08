@@ -1,21 +1,62 @@
-import { generateMockSTACItem } from '../utils/geoUtils.js';
-
 export class PlanetAdapter {
     constructor() {
-        this.name = 'Planet';
-        this.modality = 'Optical';
-        this.nativeResolution = 3.0; // 3-meter scope
-        this.baseCost = 450;
+        this.name = 'Planet Labs';
+        // Using a public CORS proxy wrapper around the official pricing endpoint
+        this.basePricingUrl = 'https://cors-anywhere.herokuapp.com/https://api.planet.com/tasking/v2/pricing/';
     }
 
-    async fetchOpportunities(bbox) {
-        // Simulating native API fetch call to Planet's /v1/collection-windows
-        const targetLat = (bbox[1] + bbox[3]) / 2;
-        const targetLon = (bbox[0] + bbox[2]) / 2;
-        
-        return [
-            generateMockSTACItem(this.name, this.modality, this.nativeResolution, this.baseCost, targetLat, targetLon),
-            generateMockSTACItem(this.name, this.modality, this.nativeResolution, this.baseCost + 100, targetLat + 0.1, targetLon - 0.1)
-        ];
+    generateGeoJsonGeometry(bbox) {
+        return {
+            type: "Polygon",
+            coordinates: [[
+                [bbox[0], bbox[1]],
+                [bbox[2], bbox[1]],
+                [bbox[2], bbox[3]],
+                [bbox[0], bbox[3]],
+                [bbox[0], bbox[1]]
+            ]]
+        };
+    }
+
+    async validateAndFetchCost(bbox, timeWindow, apiKey) {
+        // Construct standard payload structure matching official documentation
+        const orderPayload = {
+            name: `NSO_HUB_POLYGON_${Date.now()}`,
+            geometry: this.generateGeoJsonGeometry(bbox),
+            product: "one_time_tasking"
+        };
+
+        if (!apiKey) return { feasible: false, error: "Planet API transaction requires a valid PL_API_KEY token value." };
+
+        try {
+            const headers = new Headers();
+            // Official Planet Tasking API HTTP Basic Authentication requirement
+            headers.append("Authorization", "Basic " + btoa(apiKey + ":"));
+            headers.append("Content-Type", "application/json");
+            headers.append("Accept", "application/json");
+
+            const response = await fetch(this.basePricingUrl, {
+                method: "POST",
+                headers: headers,
+                body: JSON.stringify(orderPayload)
+            });
+
+            if (!response.ok) {
+                if (response.status === 429) return { feasible: false, error: "Planet API Limit Exceeded (429 Rate Limited)." };
+                const errDetail = await response.text();
+                return { feasible: false, error: `Planet Router rejected request: Status ${response.status} - ${errDetail}` };
+            }
+
+            const data = await response.json();
+            return {
+                feasible: true,
+                estimatedCost: data.estimated_quota_cost,
+                units: data.units || "SQKM",
+                determinedBy: data.determined_by || "pricing_model",
+                payload: orderPayload
+            };
+        } catch (netErr) {
+            return { feasible: false, error: `CORS Proxy or Network exception: ${netErr.message}` };
+        }
     }
 }
