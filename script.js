@@ -65,7 +65,7 @@ function setupDefaultReferenceTensors() {
 // =========================================================================
 // DISPATCHER EXECUTION MATRIX
 // =========================================================================
-document.getElementById('btn-optimize').addEventListener('click', () => {
+document.getElementById('btn-optimize').addEventListener('click', async () => {
     const rawMin = document.getElementById('bbox-min').value;
     const rawMax = document.getElementById('bbox-max').value;
     const tStartStr = document.getElementById('time-start').value;
@@ -87,7 +87,7 @@ document.getElementById('btn-optimize').addEventListener('click', () => {
     }
 
     // Process evaluation metrics loops via calculation module
-    const metrics = runStochasticOptimization(minLat, minLon, maxLat, maxLon, tStartStr, tEndStr);
+    const metrics = await runStochasticOptimization(minLat, minLon, maxLat, maxLon, tStartStr, tEndStr);
 
     // Make output containers visible
     document.getElementById('briefing-panel').classList.remove('hidden');

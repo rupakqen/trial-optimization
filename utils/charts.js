@@ -1,56 +1,66 @@
 export class MetricsChartEngine {
     constructor() {
-        this.cloudChart = null;
-        this.ganttChart = null;
+        this.primaryChartInstance = null;
+        this.ganttChartInstance = null;
     }
 
-    buildPrimaryTimeline(ctx, labels, cloud, solar, qP, pP, pC, pI) {
-        if (this.cloudChart) this.cloudChart.destroy();
-        this.cloudChart = new Chart(ctx, {
+    buildPrimaryTimeline(ctx, labels, clouds, solar, qP, pP, pC, pI) {
+        if (this.primaryChartInstance) this.primaryChartInstance.destroy();
+        
+        this.primaryChartInstance = new Chart(ctx, {
             type: 'line',
             data: {
                 labels: labels,
                 datasets: [
-                    { label: 'Planet Cum P %', data: pP, borderColor: '#C084FC', borderWidth: 3, pointRadius: 2, yAxisID: 'y' },
-                    { label: 'Planet Quality %', data: qP, borderColor: '#22C55E', borderWidth: 2, pointRadius: 0, yAxisID: 'y' },
-                    { label: 'Capella Cum P %', data: pC, borderColor: '#38BDF8', borderWidth: 1.5, borderDash: [3, 3], pointRadius: 0, yAxisID: 'y' },
-                    { label: 'ICEYE Cum P %', data: pI, borderColor: '#F43F5E', borderWidth: 1.5, borderDash: [5, 5], pointRadius: 0, yAxisID: 'y' },
-                    { label: 'Clouds %', data: cloud, borderColor: '#64748B', borderWidth: 1, pointRadius: 0, yAxisID: 'y' },
-                    { label: 'Solar Alt (°)', data: solar, borderColor: '#F59E0B', borderWidth: 1.2, borderDash: [6, 6], pointRadius: 0, yAxisID: 'y1' }
+                    { label: 'Planet Cum P %', data: pP, borderColor: '#a855f7', borderWidth: 3, radius: 1, yAxisID: 'y' },
+                    { label: 'Image Quality %', data: qP, borderColor: '#22c55e', borderWidth: 2, radius: 0, yAxisID: 'y' },
+                    { label: 'Capella Cum P %', data: pC, borderColor: '#38bdf8', borderWidth: 1.5, borderDash: [3, 3], radius: 0, yAxisID: 'y' },
+                    { label: 'ICEYE Cum P %', data: pI, borderColor: '#f43f5e', borderWidth: 1.5, borderDash: [5, 5], radius: 0, yAxisID: 'y' },
+                    { label: 'Cloud Cover %', data: clouds, borderColor: '#475569', borderWidth: 1, radius: 0, yAxisID: 'y' },
+                    { label: 'Solar Alt (°)', data: solar, borderColor: '#eab308', borderWidth: 1.5, borderDash: [6, 2], radius: 0, yAxisID: 'y1' }
                 ]
             },
             options: {
-                responsive: true, maintainAspectRatio: false, devicePixelRatio: 2,
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: true, labels: { color: '#94a3b8', font: { size: 10 } } } },
                 scales: {
-                    x: { ticks: { color: '#F1F5F9', font: { size: 9, family: 'monospace', weight: 'bold' } }, grid: { color: '#334155' } },
-                    y: { min: 0, max: 100, ticks: { color: '#F1F5F9', font: { weight: 'bold' } }, grid: { color: '#334155' } },
-                    y1: { min: 0, max: 90, display: true, position: 'right', ticks: { color: '#F59E0B' }, grid: { drawOnChartArea: false } }
-                },
-                plugins: { legend: { labels: { color: '#F8FAFC', font: { size: 9, family: 'monospace', weight: 'bold' } } } }
+                    x: { ticks: { color: '#64748b', font: { size: 9 } }, grid: { color: '#1e293b' } },
+                    y: { min: 0, max: 100, ticks: { color: '#64748b' }, grid: { color: '#1e293b' } },
+                    y1: { min: 0, max: 90, position: 'right', display: true, ticks: { color: '#eab308' }, grid: { drawOnChartArea: false } }
+                }
             }
         });
     }
 
     buildGanttTimeline(ctx, labels, ganttData) {
-        if (this.ganttChart) this.ganttChart.destroy();
-        this.ganttChart = new Chart(ctx, {
+        if (this.ganttChartInstance) this.ganttChartInstance.destroy();
+
+        this.ganttChartInstance = new Chart(ctx, {
             type: 'bar',
             data: {
                 labels: labels,
                 datasets: [
-                    { label: 'Optical Preferred', data: ganttData.opt, backgroundColor: '#A855F7', barPercentage: 0.9 },
-                    { label: 'SAR Mandatory', data: ganttData.sar, backgroundColor: '#38BDF8', barPercentage: 0.9 },
-                    { label: 'Combined Target', data: ganttData.comb, backgroundColor: '#22C55E', barPercentage: 0.9 }
+                    { label: 'Optical Preferred', data: ganttData.opt, backgroundColor: '#a855f7', barPercentage: 0.85 },
+                    { label: 'SAR Mandatory', data: ganttData.sar, backgroundColor: '#38bdf8', barPercentage: 0.85 },
+                    { label: 'Combined Opportunity', data: ganttData.comb, backgroundColor: '#22c55e', barPercentage: 0.85 }
                 ]
             },
             options: {
-                responsive: true, maintainAspectRatio: false, devicePixelRatio: 2,
-                indexAxis: 'x',
-                scales: {
-                    x: { stacked: true, ticks: { color: '#F1F5F9', font: { size: 9, family: 'monospace', weight: 'bold' } }, grid: { color: '#334155' } },
-                    y: { stacked: true, min: 0, max: 3, display: false }
+                responsive: true, maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: true, labels: { color: '#94a3b8', font: { size: 10 } } },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `${context.dataset.label} (Relative Cost-Scale Factor: ${context.raw.toFixed(2)})`;
+                            }
+                        }
+                    }
                 },
-                plugins: { legend: { labels: { color: '#F8FAFC', font: { size: 9, family: 'monospace', weight: 'bold' } } } }
+                scales: {
+                    x: { stacked: true, ticks: { color: '#64748b', font: { size: 9 } }, grid: { color: '#1e293b' } },
+                    y: { stacked: true, display: false, min: 0, max: 6 } // Keeps proportional bars framed cleanly
+                }
             }
         });
     }
