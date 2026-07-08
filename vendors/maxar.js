@@ -1,4 +1,4 @@
-import { generateMockSTACItem } from '../utils/geoUtils.js';
+import { generateMockSTACItem } from '../utils/geo.js';
 
 export class MaxarAdapter {
     constructor() {
